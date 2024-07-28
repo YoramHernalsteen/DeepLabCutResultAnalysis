@@ -1,0 +1,1 @@
+ini_file = 'dlc_pixel_analyser.ini'
