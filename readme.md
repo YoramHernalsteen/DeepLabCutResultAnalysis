@@ -16,3 +16,22 @@ chmod +x run.sh
 ```
 ./run.ps1
 ```
+
+## Commands
+Display help
+```
+help
+```
+
+Create a heatmap
+```
+heatmap [bodypart]
+
+heatmap centre
+```
+
+Create a trace of followed path
+```
+trace [bodypath]
+trace centre
+```
