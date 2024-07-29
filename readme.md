@@ -27,11 +27,17 @@ Create a heatmap
 ```
 heatmap [bodypart]
 
+```
+If you would want a heatmap of the centre of the body:
+```
 heatmap centre
 ```
 
 Create a trace of followed path
 ```
 trace [bodypath]
+```
+If you would want a trace of the centre of the body:
+```
 trace centre
 ```
