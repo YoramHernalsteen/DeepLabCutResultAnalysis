@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import gc
 
 from typing import List
 from models.pixel_bodypart import PixelBodypart
@@ -18,3 +19,8 @@ def trace_path(bodypart_pixels: List[PixelBodypart], output_file_path: str):
     plt.title(f'Path of mouse {bodypart}')
 
     plt.savefig(output_file_path, transparent=True)
+
+    plt.cla()
+    plt.clf()
+    plt.close('all')
+    gc.collect()

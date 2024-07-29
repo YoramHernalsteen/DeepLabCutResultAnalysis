@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import PowerNorm
 import pandas as pd
 import numpy as np
+import gc
 
 from typing import List
 from models.pixel_bodypart import PixelBodypart
@@ -47,5 +48,10 @@ def plot_density_map_continous(bodypart_pixels: List[PixelBodypart], output_file
     plt.title(f'Heatmap of Coordinates (Interpolared bicubic) for {bodypart}')
 
     plt.savefig(output_file_path, transparent=True)
+
+    plt.cla()
+    plt.clf()
+    plt.close('all')
+    gc.collect()
 
 
