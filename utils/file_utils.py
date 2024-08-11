@@ -29,6 +29,10 @@ def convert_filename_to_png(filename):
     root, _ = os.path.splitext(filename)
     return root + '.png'
 
+def convert_filename_to_csv(filename):
+    root, _ = os.path.splitext(filename)
+    return root + '.csv'
+
 def convert_filename_to_tiff(filename, prefix = None, postfix = None):
     root, _ = os.path.splitext(filename)
     if prefix is not None and isinstance(prefix, str):
@@ -60,3 +64,7 @@ def verify_output_folder() -> None:
 def generate_output_file_location(file: str) -> str:
     """Generates the correct file location in the output folder for a given filename."""
     return os.path.join(config_utils.output_path(), convert_filename_to_png(file))
+
+def generate_output_file_location_csv(file: str) -> str:
+    """Generates the correct file location in the output folder for a given filename."""
+    return os.path.join(config_utils.output_path(), convert_filename_to_csv(file))

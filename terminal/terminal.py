@@ -4,14 +4,24 @@ import utils.csv_utils as csv_utils
 import analysis.path_analysis as path_analysis
 import analysis.density_analysis as density_analysis 
 import os
-
 import utils.constants as constants
+
+from terminal.parser import Parser
+from terminal.argument_definition import ArgDefinition, CommandDefinition
+from terminal.argument_type import ArgumentType
 
 class Terminal():
     initialized: bool = False
     running: bool = False
+    parser: Parser
 
     def initialize(self):
+        self.check_for_valid_ini()
+        self.initialize_parser()
+        self.initialized = True
+        self.running = True
+
+    def check_for_valid_ini(self):
         while not config.has_valid_ini_file():
             print('First we need to create a valid configuration file!')
             print('Input folder:')
@@ -26,10 +36,30 @@ class Terminal():
                 print('Start by typing a command.')
                 print()
                 print('Type in help for more information. Type in quit to quit.')
-        
-        self.initialized = True
-        self.running = True
 
+    def initialize_parser(self):
+        self.parser = Parser()
+        self.parser.add_command_definition(CommandDefinition('trace', 'Trace the path taken by the mouse')                 
+                .add_argument_definition(ArgDefinition('-b', 'bodypart', 'Choose bodypart of trace analysis', ArgumentType.TYPE_STR))
+                .add_argument_definition(ArgDefinition('-d', 'distance', 'Show distance travelled in subtitle of plot', ArgumentType.TYPE_DIMENSION))
+                .add_argument_definition(ArgDefinition('-s', 'speed', 'Show speed travelled in subtitle of plot', ArgumentType.TYPE_DIMENSION))
+                .add_argument_definition(ArgDefinition('-sd', 'speed and distance', 'Show speed and distance travelled in subtitle of plot', ArgumentType.TYPE_DIMENSION))
+                )
+        self.parser.add_command_definition(CommandDefinition('heatmap', 'Create a heatmap of places most visited')                 
+                .add_argument_definition(ArgDefinition('-b', 'bodypart', 'Choose bodypart of trace analysis', ArgumentType.TYPE_STR))
+                )
+        self.parser.add_command_definition(CommandDefinition('quit', 'Quit the application'))
+
+        self.parser.add_command_definition(CommandDefinition('csv_trace', 'Create a csv with speed, distance, ... of all files of a bodypart')                 
+                .add_argument_definition(ArgDefinition('-b', 'bodypart', 'Choose bodypart of trace analysis', ArgumentType.TYPE_STR))
+                .add_argument_definition(ArgDefinition('-s', 'size', 'size of the box', ArgumentType.TYPE_DIMENSION))
+                )
+        self.parser.add_command_definition(CommandDefinition('dist_interval_csv', 'Create a csv per file with distance and speed per interval')                 
+                .add_argument_definition(ArgDefinition('-b', 'bodypart', 'Choose bodypart of trace analysis', ArgumentType.TYPE_STR))
+                .add_argument_definition(ArgDefinition('-t', 'time', 'Time interval in seconds', ArgumentType.TYPE_INT))
+                .add_argument_definition(ArgDefinition('-s', 'size', 'size of the box', ArgumentType.TYPE_DIMENSION))
+                )
+        
     def greet(self):
         print("\033[92m")
         print("         _._")
@@ -50,56 +80,98 @@ class Terminal():
         print('')
 
     def evaluate_input(self, v: str):
-        if v is None or not isinstance(v, str) or v.strip() == '':
-            print('That command is not recognized, please try again.')
-            return()
+        command = self.parser.parse(v)
+        if command is None:
+            print('That command is unknown, please try again')
+            return
         
-        v = v.strip()
-        v_key = v.split(" ", 1)[0]
-        if(len(v.split(" ", 1)) > 1):
-            v = v.split(" ", 1)[1]
-            v = v.strip()
-        else:
-            v = ''
-
-        if v_key.lower() == 'quit':
+        if command.command == 'quit':
             self.running = False
             return
-        elif v_key.lower() == 'heatmap':
-            bodypart_heatmap = v.split(" ", 1)[0]
-            if bodypart_heatmap is None or bodypart_heatmap == '':
+        elif command.command == 'heatmap':
+            bodypart = command.get_argument('bodypart').value
+            if bodypart is None:
                 print('Bodypart is not valid.')
-                return
+
             for file in file_utils.input_files():
-                data = csv_utils.read_body_part(bodypart_heatmap, file)
+                data = csv_utils.read_body_part(bodypart, file)
                 file_name = file_utils.base_filename(file)
-                output_file = file_utils.generate_output_file_location(file_utils.convert_filename_to_tiff(filename=file_name, prefix=f'{v_key}_{bodypart_heatmap}'))
+                output_file = file_utils.generate_output_file_location(file_utils.convert_filename_to_tiff(filename=file_name, prefix=f'{command.command}_{bodypart}'))
                 if os.path.exists(output_file):
                     os.remove(output_file)
                 density_analysis.plot_density_map_continous(data, output_file)
             
             print('Generated all heatmaps. Please type in a command or quit.')
             return
-        elif v_key.lower() == 'trace':
-            bodypart_trace = v.split(" ", 1)[0]
-            if bodypart_trace is None or bodypart_trace == '':
+        elif command.command == 'trace':
+            bodypart = command.get_argument('bodypart').value
+            if bodypart is None:
                 print('Bodypart is not valid.')
-                return
+            calculate_distance = False
+            calculate_speed = False
+            real_size = ''
+            if command.has_argument('speed and distance'):
+                calculate_speed = True
+                calculate_distance = True
+                real_size = command.get_argument('speed and distance').value
+            if command.has_argument('speed'):
+                calculate_speed = True
+                real_size = command.get_argument('speed').value
+            if command.has_argument('distance'):
+                calculate_distance = True
+                real_size = command.get_argument('distance').value
+
             for file in file_utils.input_files():
-                data = csv_utils.read_body_part(bodypart_trace, file)
+                data = csv_utils.read_body_part(bodypart, file)
                 file_name = file_utils.base_filename(file)
-                output_file = file_utils.generate_output_file_location(file_utils.convert_filename_to_tiff(filename=file_name, prefix=f'{v_key}_{bodypart_trace}'))
+                output_file = file_utils.generate_output_file_location(file_utils.convert_filename_to_tiff(filename=file_name, prefix=f'{command.command}_{bodypart}'))
                 if os.path.exists(output_file):
                     os.remove(output_file)
-                path_analysis.trace_path(data, output_file)
+                path_analysis.trace_path(data, output_file, real_size, calculate_distance, calculate_speed)
             
             print('Generated all trace plots. Please type in a command or quit.')
             return
-        elif v_key.lower() == 'help':
-            self.display_help()
+        elif command.command == 'csv_trace':
+            bodypart = command.get_argument('bodypart').value
+            if bodypart is None:
+                print('Bodypart is not valid.')
+            
+            real_size = command.get_argument('size')
+            if real_size is None:
+                print('Size is not valid.')
+                return
+
+            output_file = file_utils.generate_output_file_location_csv('analysis')
+            if os.path.exists(output_file):
+                os.remove(output_file)
+            files = file_utils.input_files()
+            path_analysis.create_path_analysis_table(output_file, files, real_size.value, bodypart)
+            print('Generated csv analysis file. Please type in a command or quit.')
             return
-        else:
-            print('That command is not recognized, please try again.')
+        elif command.command == 'dist_interval_csv':
+            bodypart = command.get_argument('bodypart').value
+            if bodypart is None:
+                print('Bodypart is not valid.')
+
+            real_size = command.get_argument('size')
+            if real_size is None:
+                print('Size is not valid.')
+                return
+            time_interval = 60
+            if command.has_argument('time'):
+                time_interval = int(command.get_argument('time').value)
+            else:
+                print('Using default time interval of 60 seconds.')
+
+            for file in file_utils.input_files():
+                data = csv_utils.read_body_part(bodypart, file)
+                file_name = file_utils.base_filename(file)
+                output_file = file_utils.generate_output_file_location_csv(f'{command.command}_{bodypart}_{file_name}')
+                if os.path.exists(output_file):
+                    os.remove(output_file)
+                path_analysis.distance_interval_csv(data, time_interval, real_size.value, output_file)
+            
+            print('Generated all distance csv`s. Please type in a command or quit.')
             return
 
     def display_help(self):

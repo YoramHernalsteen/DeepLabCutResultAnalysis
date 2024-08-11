@@ -69,5 +69,10 @@ def read_body_part(body_part: str, csv_file_path: str) -> List[PixelBodypart]:
     
     return results
 
+def write_to_csv(file: str, data: List):
+    with open(file, mode="w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerows(data)
+
 
     

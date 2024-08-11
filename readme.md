@@ -25,19 +25,32 @@ help
 
 Create a heatmap
 ```
-heatmap [bodypart]
+heatmap -b [bodypart]
 
 ```
 If you would want a heatmap of the centre of the body:
 ```
-heatmap centre
+heatmap -b centre
 ```
 
 Create a trace of followed path
 ```
-trace [bodypath]
+trace -b [bodypath]
 ```
 If you would want a trace of the centre of the body:
 ```
-trace centre
+trace -b centre
+```
+Creating a csv file for the inputfiles with the distance and speed per time interval.
+
+```
+dist_interval_csv -b [Bodypart] -s [Size] -t [Timeinterval]
+```
+
+Results: Speed is in cm per second, distance is in cm.
+
+Arguments: Size (-s) is in cm. Time interval (-t) is in seconds. Bodypart (-b) is the bodypart used
+
+```
+dist_interval_csv -b centre -s 50x50 -t 120
 ```
