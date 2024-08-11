@@ -18,12 +18,12 @@ chmod +x run.sh
 ```
 
 ## Commands
-Display help
+### Display help
 ```
 help
 ```
 
-Create a heatmap
+### Create a heatmap
 ```
 heatmap -b [bodypart]
 
@@ -33,18 +33,30 @@ If you would want a heatmap of the centre of the body:
 heatmap -b centre
 ```
 
-Create a trace of followed path
+### Create a trace of followed path
 ```
-trace -b [bodypath]
+trace -b [bodypart]
 ```
-If you would want a trace of the centre of the body:
+If you would want a trace plot of the centre of the body:
 ```
 trace -b centre
 ```
-Creating a csv file for the inputfiles with the distance and speed per time interval.
+
+### If you would want a trace in csv form per file (speed and distance):
+```
+trace_csv -b [bodypart] -s [size]
+```
+Results: Speed is in cm per second, distance is in cm.
+
+Arguments: Size (-s) is in cm. Time interval (-t) is in seconds. Bodypart (-b) is the bodypart used
+```
+trace_csv -b centre -s 50x50
+```
+
+### Creating a csv file for the inputfiles with the distance and speed per time interval.
 
 ```
-dist_interval_csv -b [Bodypart] -s [Size] -t [Timeinterval]
+dist_interval_csv -b [bodypart] -s [size] -t [Timeinterval]
 ```
 
 Results: Speed is in cm per second, distance is in cm.
