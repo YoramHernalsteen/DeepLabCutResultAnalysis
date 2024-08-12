@@ -50,7 +50,7 @@ class Terminal():
                 )
         self.parser.add_command_definition(CommandDefinition('quit', 'Quit the application'))
 
-        self.parser.add_command_definition(CommandDefinition('csv_trace', 'Create a csv with speed, distance, ... of all files of a bodypart')                 
+        self.parser.add_command_definition(CommandDefinition('trace_csv', 'Create a csv with speed, distance, ... of all files of a bodypart')                 
                 .add_argument_definition(ArgDefinition('-b', 'bodypart', 'Choose bodypart of trace analysis', ArgumentType.TYPE_STR))
                 .add_argument_definition(ArgDefinition('-s', 'size', 'size of the box', ArgumentType.TYPE_DIMENSION))
                 )
@@ -131,7 +131,7 @@ class Terminal():
             
             print('Generated all trace plots. Please type in a command or quit.')
             return
-        elif command.command == 'csv_trace':
+        elif command.command == 'trace_csv':
             bodypart = command.get_argument('bodypart').value
             if bodypart is None:
                 print('Bodypart is not valid.')
