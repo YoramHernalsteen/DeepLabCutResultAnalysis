@@ -9,8 +9,7 @@ import utils.csv_utils as csv_utils
 import utils.file_utils as file_utils
 from analysis.utils.pixel_cm_convertor import PixelCmConvertor
 from models.pixel_bodypart import PixelBodypart
-
-FRAME_RATE: int = 10
+from utils.constants import FRAME_RATE
 
 
 def trace_path(

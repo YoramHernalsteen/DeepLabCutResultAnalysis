@@ -1,16 +1,19 @@
-from terminal.argument_type import ArgumentType
 from typing import List
+
 import terminal.argument_validator as arg_validator
+from terminal.argument_type import ArgumentType
+
 
 class Argument:
     argument: str
     value: str
     type: ArgumentType
 
-    def __init__(self, argument: str, value:str, type: ArgumentType):
+    def __init__(self, argument: str, value: str, type: ArgumentType):
         self.argument = argument
         self.value = value
         self.type = type
+
 
 class Command:
     command: str
@@ -19,14 +22,14 @@ class Command:
     def __init__(self, command: str):
         self.command = command
         self.arguments = []
-    
+
     def add_argument(self, argument: Argument):
         self.arguments.append(argument)
         return self
-    
+
     def has_argument(self, arg: str):
         return arg in [a.argument for a in self.arguments]
-    
+
     def get_argument(self, arg: str):
         if not self.has_argument(arg):
             return None
